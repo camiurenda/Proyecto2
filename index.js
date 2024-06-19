@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-mongoose.connect(process.env.DB_STRING)
+mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado a MongoDB'))
   .catch(err => console.error('Error al conectarse a MongoDB', err));
 app.use(express.json());

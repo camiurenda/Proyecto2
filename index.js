@@ -38,10 +38,17 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conectado a MongoDB'))
-  .catch(err => console.error('Error al conectarse a MongoDB', err));
-app.use(express.json());
+const uri = 'mongodb+srv://urendacamila:urendacamilaMongo@clustermongodb.95vstra.mongodb.net/PROYECTO2';
+
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+    // Start your application logic here
+  })
+  .catch(err => {
+    console.error('Error connecting to MongoDB:', err.message);
+    // Handle error appropriately
+  });
 
 app.get("/", async (request, response) => {
       return response.send("Beckend reclamos node js express");

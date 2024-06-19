@@ -2,7 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require("mongoose");
 const swaggerUi = require('swagger-ui-express')
-const swaggerDocument = require('./swagger-output.json');
+const swaggerDocument = require('./swagger-output.json')
+const swaggerSpec = require('./src/utils/swagger');
 
 // const swaggerUi = require('swagger-ui-express')
 // const swaggerDocument = require('./swagger-output.json');
@@ -11,6 +12,7 @@ const swaggerDocument = require('./swagger-output.json');
 // const loginRouter = require("./src/modules/login/login.routes");
 // const reclamoRouter = require("./src/modules/claim/claim.routes");
 const usuarioRouter = require("./src/modules/user/user.routes");
+const productoRouter = require("./src/modules/products/products.routes")
 // const areaRouter = require("./src/modules/area/area.routes");
 // const claimTypeRoute = require("./src/modules/claimType/claimType.routes");
 // const auditRoute = require("./src/modules/audit/audit.routes");
@@ -36,17 +38,20 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-mongoose.connect(
-  process.env.DB_RECLAMO, { useNewUrlParser: true, useUnifiedTopology: true }
-);
+mongoose.connect(process.env.DB_STRING)
+  .then(() => console.log('Conectado a MongoDB'))
+  .catch(err => console.error('Error al conectarse a MongoDB', err));
+app.use(express.json());
 
 app.get("/", async (request, response) => {
       return response.send("Beckend reclamos node js express");
 });
+
 // Routers
 // app.use(loginRouter);
 // app.use(reclamoRouter);
 app.use(usuarioRouter);
+app.use(productoRouter)
 // app.use(areaRouter);
 // app.use(claimTypeRoute);
 // app.use(auditRoute);

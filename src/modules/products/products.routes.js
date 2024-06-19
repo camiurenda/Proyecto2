@@ -1,10 +1,11 @@
 const express = require("express");
-const productService = require("./product.service");
+const productService = require("./products.service");
 
 const router = express.Router();
 
 // GET 
 router.get("/api/products", async (req, res) => {
+      // #swagger.tags = ['Producto']
   try {
     const params = JSON.parse(req.headers["params"]);
     const paginated = await productService.findAll(params);
@@ -17,6 +18,7 @@ router.get("/api/products", async (req, res) => {
 
 // GET (id)
 router.get("/api/products/:id", async (req, res) => {
+          // #swagger.tags = ['Producto']
   try {
     const productId = req.params.id;
     const product = await productService.findById(productId);
@@ -32,6 +34,7 @@ router.get("/api/products/:id", async (req, res) => {
 
 // post
 router.post("/api/products", async (req, res) => {
+          // #swagger.tags = ['Producto']
   try {
     const newProduct = req.body;
     const product = await productService.create(newProduct);
@@ -44,6 +47,7 @@ router.post("/api/products", async (req, res) => {
 
 //update
 router.put("/api/products/:id", async (req, res) => {
+          // #swagger.tags = ['Producto']
   try {
     const productId = req.params.id;
     const updatedProduct = req.body;
@@ -57,6 +61,7 @@ router.put("/api/products/:id", async (req, res) => {
 
 //delete
 router.delete("/api/products/:id", async (req, res) => {
+          // #swagger.tags = ['Producto']
   try {
     const productId = req.params.id;
     await productService.remove(productId);

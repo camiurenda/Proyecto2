@@ -1,24 +1,24 @@
 const express = require("express");
 const userService = require("./user.service");
-const User = require("../../models/user"); 
 const Product = require("../../models/products");
+const User = require("../../models/user")
 
 const router = express.Router();
 
 // GET /api/user
-router.get("/api/user", async (req, res) => {
-  // #swagger.tags = ['Usuario']
+router.get("/api/users", async (req, res) => {
   try {
-    params = JSON.parse(req.headers['params'])
-
-    let paginated = await userService.paginated(params)
-    return res.status(200).send(paginated);
-
+      const { page = 0, perPage = 10, filter = "{}", sort = "{}" } = req.query; // Captura los parámetros de consulta
+      const parsedFilter = JSON.parse(filter); // Convertir cadena a objeto JSON
+      const parsedSort = JSON.parse(sort); // Convertir cadena a objeto JSON
+      const paginatedUsers = await userService.paginated({ page, perPage, filter: parsedFilter, sort: parsedSort });
+      res.status(200).send(paginatedUsers);
   } catch (error) {
-    console.log(error)
-    return res.status(500).send(error);
+      console.error(`Error en el paginado: ${error.message}`);
+      res.status(500).send({ message: error.message });
   }
 });
+
 
 // GET /api/user/:id
 router.get("/api/user/:id",  async (req, res) => {
@@ -79,30 +79,29 @@ router.delete("/api/user/:id", async (req, res) => {
 });
 
 //Post para asociar usuario y producto
-router.post("/api/users/:userId/products/:productId", async (req, res) => {
+router.post("/api/user/:userId/product/:productId", async (req, res) => {
   try {
-    const { userId, productId } = req.params;
-    console.log(`Received request to associate product ${productId} with user ${userId}`);
+      const { userId, productId } = req.params;
 
-    const userModel = await User.findById(userId); // Uso correcto del modelo User
-    if (!user) {
-      console.error(`User with ID ${userId} not found`);
-      return res.status(404).send({ message: "User not found" });
-    }
+      // Find user and product
+      const user = await User.findById(userId);
+      const product = await Product.findById(productId);
 
-    const product = await Product.findById(productId); // Uso correcto del modelo Product
-    if (!product) {
-      console.error(`Product with ID ${productId} not found`);
-      return res.status(404).send({ message: "Product not found" });
-    }
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+      if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+      }
 
-    user.productos.push(productId);
-    await user.save();
-    console.log(`Product ${productId} associated with user ${userId}`);
-    res.status(200).send(user);
+      // Associate product with user
+      user.productos.push(productId);
+      await user.save(); // Save the updated user
+
+      res.status(200).json({ message: "Product associated with user successfully", user }); 
   } catch (error) {
-    console.error(`Error associating product with user: ${error.message}`);
-    res.status(500).send({ message: error.message });
+      console.error("Error associating product with user:", error);
+      res.status(500).json({ message: "Internal server error" });
   }
 });
 

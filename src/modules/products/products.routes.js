@@ -32,7 +32,7 @@ router.get("/api/products/:id", async (req, res) => {
     const productId = req.params.id;
     const product = await productService.findById(productId);
     if (!product) {
-      return res.status(404).send("Producto no encontrado");
+      return res.status(404).send("El producto no ha sido encontrado");
     }
     return res.status(200).send(product);
   } catch (error) {

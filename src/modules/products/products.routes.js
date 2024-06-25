@@ -1,20 +1,27 @@
 const express = require("express");
 const productService = require("./products.service");
-
-const userModel = require("../../models/user")
-
 const router = express.Router();
 
 // GET 
 router.get("/api/products", async (req, res) => {
-      // #swagger.tags = ['Producto']
+  // #swagger.tags = ['Producto']
   try {
-    const params = JSON.parse(req.headers["params"]);
-    const paginated = await productService.findAll(params);
-    return res.status(200).send(paginated);
+    const { page = 0, perPage = 10, filter = "{}", sort = "{}" } = req.query;
+    const parsedFilter = JSON.parse(filter);
+    const parsedSort = JSON.parse(sort);
+    const params = {
+      page: parseInt(page),
+      perPage: parseInt(perPage),
+      filter: parsedFilter,
+      sort: parsedSort
+    };
+    const paginatedProducts = await productService.findAll(params);
+
+    res.status(200).send(paginatedProducts); 
+
   } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
+    console.error(`Error paginating products: ${error.message}`);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 });
 

@@ -1,6 +1,8 @@
 const express = require("express");
 const productService = require("./products.service");
 
+const userModel = require("../../models/user")
+
 const router = express.Router();
 
 // GET 
@@ -69,34 +71,6 @@ router.delete("/api/products/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).send(error);
-  }
-});
-
-//Post para asociar usuario y producto
-router.post("/api/users/:userId/products/:productId", async (req, res) => {
-  try {
-    const { userId, productId } = req.params;
-    console.log(`Received request to associate product ${productId} with user ${userId}`);
-
-    const user = await User.findById(userId); // Uso correcto del modelo User
-    if (!user) {
-      console.error(`User with ID ${userId} not found`);
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    const product = await Product.findById(productId); // Uso correcto del modelo Product
-    if (!product) {
-      console.error(`Product with ID ${productId} not found`);
-      return res.status(404).send({ message: "Product not found" });
-    }
-
-    user.productos.push(productId);
-    await user.save();
-    console.log(`Product ${productId} associated with user ${userId}`);
-    res.status(200).send(user);
-  } catch (error) {
-    console.error(`Error associating product with user: ${error.message}`);
-    res.status(500).send({ message: error.message });
   }
 });
 

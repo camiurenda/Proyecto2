@@ -168,8 +168,23 @@
         "description": "",
         "parameters": [
           {
-            "name": "params",
-            "in": "header",
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
             "type": "string"
           }
         ],

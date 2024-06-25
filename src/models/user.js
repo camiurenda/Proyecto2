@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   documento:String,
   rol:String,
   area:String,
+  productos: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
 });
 
 const userModel = mongoose.model("User", userSchema);

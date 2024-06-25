@@ -1,5 +1,5 @@
 const express = require("express");
-const userService = require("./user.service");´
+const userService = require("./user.service");
 const User = require("../../models/user"); 
 const Product = require("../../models/products");
 

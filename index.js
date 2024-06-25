@@ -38,9 +38,9 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-const uri = 'mongodb+srv://urendacamila:urendacamilaMongo@clustermongodb.95vstra.mongodb.net/PROYECTO2';
+//const uri = 'mongodb+srv://urendacamila:urendacamilaMongo@clustermongodb.95vstra.mongodb.net/PROYECTO2';
 
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB');
     // Start your application logic here

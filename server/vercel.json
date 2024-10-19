@@ -17,7 +17,8 @@
                 "PATCH",
                 "DELETE",
                 "OPTIONS"
-            ]
+            ],
+            "include": ["swagger-output.json"]
         }
     ]
 }

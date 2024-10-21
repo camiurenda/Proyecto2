@@ -36,8 +36,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin 
-    // (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -56,8 +54,6 @@ app.use(cors(corsOptions));
 
 app.options('*', cors(corsOptions));
 
-
-// Enable the use of request body parsing middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -69,11 +65,9 @@ app.use(bodyParser.urlencoded({
 mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB');
-    // Start your application logic here
   })
   .catch(err => {
     console.error('Error connecting to MongoDB:', err.message);
-    // Handle error appropriately
   });
 
 app.get("/", async (request, response) => {

@@ -30,12 +30,14 @@ const port = process.env.PORT
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
-  'https://proyecto2front.vercel.app/',
-  'https://proyecto2server.vercel.app/',
+  'https://proyecto2front.vercel.app',
+  'https://proyecto2server.vercel.app'
 ];
 
-app.use(cors({
-  origin: function(origin, callback) {
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin 
+    // (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -43,8 +45,17 @@ app.use(cors({
     }
     return callback(null, true);
   },
-  credentials: true
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'device-remember-token', 'Access-Control-Allow-Origin', 'Origin', 'Accept'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+
+app.options('*', cors(corsOptions));
+
 
 // Enable the use of request body parsing middleware
 app.use(bodyParser.json());

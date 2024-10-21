@@ -4,7 +4,7 @@ const pager = require("../../utils/pager");
 async function createIfNotExists(decoded, response) {
     let user = await findOne(decoded.email)
     if(!user){
-        user = {firtname:decoded.given_name, lastname: decoded.family_name ,email:decoded.email}
+        user = {firstname:decoded.given_name, lastname: decoded.family_name ,email:decoded.email}
         await save(user)
     }
     return user   

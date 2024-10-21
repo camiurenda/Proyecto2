@@ -1,23 +1,34 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "index.js",
-        "use": "@vercel/node"
-      },
-      {
-        "src": "swagger-output.json",
-        "use": "@vercel/static"
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "swagger-output.json",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/swagger-output.json",
+      "dest": "/swagger-output.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.js",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS"
+      ],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
       }
-    ],
-    "routes": [
-      {
-        "src": "/swagger-output.json",
-        "dest": "/swagger-output.json"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "index.js"
-      }
-    ]
-  }
+    }
+  ]
+}

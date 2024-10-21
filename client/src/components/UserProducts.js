@@ -1,36 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Layout, message } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
+import axios from 'axios';
+import { Layout, Table, Button, Spin } from 'antd';
 
 const { Content } = Layout;
 
 const UserProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
-    fetchUserProducts();
-  }, [id]);
+    const fetchUserAndProducts = async () => {
+      try {
+        setLoading(true);
+        const token = await getAccessTokenSilently();
+        
+        const userResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUser(userResponse.data);
 
-  const fetchUserProducts = async () => {
-    setLoading(true);
-    try {
-      const token = await getAccessTokenSilently();
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setProducts(response.data.productos || []);
-    } catch (error) {
-      console.error('Error fetching user products:', error);
-      message.error('Error al cargar los productos del usuario');
-    }
-    setLoading(false);
-  };
+        const productPromises = userResponse.data.productos.map(productId =>
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/products/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+        );
+
+        const productResponses = await Promise.all(productPromises);
+        const fullProducts = productResponses.map(response => response.data);
+        setProducts(fullProducts);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndProducts();
+  }, [id, getAccessTokenSilently]);
 
   const columns = [
     {
@@ -42,26 +55,73 @@ const UserProducts = () => {
       title: 'Precio',
       dataIndex: 'precio',
       key: 'precio',
+      render: (precio) => `$${precio.toLocaleString('es-AR')}`,
     },
     {
       title: 'Categoría',
       dataIndex: 'categoria',
       key: 'categoria',
     },
+    {
+      title: 'Descripción',
+      dataIndex: 'descripcion',
+      key: 'descripcion',
+      ellipsis: true,
+    },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <Layout>
-      <Content style={{ padding: '50px' }}>
-        <h1>Productos del Usuario</h1>
-        <Table
-          columns={columns}
-          dataSource={products}
-          rowKey="_id"
-          loading={loading}
-        />
-        <Button onClick={() => navigate('/users')}>Volver a la lista de usuarios</Button>
-        <Button onClick={() => navigate('/products')}>Ir a la lista de productos</Button>
+      <Content className="p-8">
+        {user && (
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-2">
+              Productos de {user.firstname} {user.lastname}
+            </h1>
+            <p className="text-gray-400">
+              Email: {user.email} | Documento: {user.documento}
+            </p>
+          </div>
+        )}
+
+        {products.length === 0 ? (
+          <div className="text-center py-8">
+            <h2 className="text-xl text-gray-500">
+              Este usuario no tiene productos asignados
+            </h2>
+          </div>
+        ) : (
+          <Table
+            columns={columns}
+            dataSource={products}
+            rowKey="_id"
+            pagination={false}
+            className="mb-6"
+          />
+        )}
+
+        <div className="flex gap-4">
+          <Button 
+            onClick={() => navigate('/users')}
+            className="mr-4"
+          >
+            Volver a la lista de usuarios
+          </Button>
+          <Button 
+            onClick={() => navigate('/products')}
+            type="primary"
+          >
+            Ir a la lista de productos
+          </Button>
+        </div>
       </Content>
     </Layout>
   );

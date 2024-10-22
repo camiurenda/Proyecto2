@@ -78,6 +78,35 @@ router.delete("/api/user/:id", async (req, res) => {
   }
 });
 
+router.get("/api/user/:userId/products", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId)
+                          .populate('productos')
+                          .exec();
+    
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    return res.status(200).json({
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        documento: user.documento
+      },
+      products: user.productos || []
+    });
+  } catch (error) {
+    console.error("Error al obtener los productos del usuario:", error);
+    return res.status(500).json({ 
+      message: "Error al obtener los productos del usuario",
+      error: error.message 
+    });
+  }
+});
+
 //Post para asociar usuario y producto
 router.post("/api/user/:userId/product/:productId", async (req, res) => {
   try {

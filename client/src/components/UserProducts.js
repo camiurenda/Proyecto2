@@ -1,49 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Layout, Table, Button, Spin } from 'antd';
+import axios from 'axios';
+import { Layout, Table, Button, Spin, message } from 'antd';
 
 const { Content } = Layout;
 
 const UserProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [user, setUser] = useState(null);
+  const [userProducts, setUserProducts] = useState({ user: null, products: [] });
   const [loading, setLoading] = useState(true);
   const { getAccessTokenSilently } = useAuth0();
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserAndProducts = async () => {
+    const fetchUserProducts = async () => {
       try {
         setLoading(true);
         const token = await getAccessTokenSilently();
         
-        const userResponse = await axios.get(
-          `${process.env.REACT_APP_API_URL}/user/${id}`,
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/user/${id}/products`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setUser(userResponse.data);
 
-        const productPromises = userResponse.data.productos.map(productId =>
-          axios.get(
-            `${process.env.REACT_APP_API_URL}/products/${productId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-        );
-
-        const productResponses = await Promise.all(productPromises);
-        const fullProducts = productResponses.map(response => response.data);
-        setProducts(fullProducts);
+        setUserProducts(response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching user products:', error);
+        message.error('Error al cargar los productos del usuario');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserAndProducts();
+    fetchUserProducts();
   }, [id, getAccessTokenSilently]);
 
   const columns = [
@@ -56,7 +46,7 @@ const UserProducts = () => {
       title: 'Precio',
       dataIndex: 'precio',
       key: 'precio',
-      render: (precio) => `$${precio.toLocaleString('es-AR')}`,
+      render: (precio) => precio ? `$${precio.toLocaleString('es-AR')}` : 'N/A',
     },
     {
       title: 'Categoría',
@@ -79,6 +69,8 @@ const UserProducts = () => {
     );
   }
 
+  const { user, products } = userProducts;
+
   return (
     <Layout>
       <Content className="p-8">
@@ -87,13 +79,16 @@ const UserProducts = () => {
             <h1 className="text-2xl font-bold mb-2">
               Productos de {user.firstname} {user.lastname}
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-400 mb-4">
               Email: {user.email} | Documento: {user.documento}
+            </p>
+            <p className="text-gray-400">
+              Total de productos asociados: {products.length}
             </p>
           </div>
         )}
 
-        {products.length === 0 ? (
+        {(!products || products.length === 0) ? (
           <div className="text-center py-8">
             <h2 className="text-xl text-gray-500">
               Este usuario no tiene productos asignados

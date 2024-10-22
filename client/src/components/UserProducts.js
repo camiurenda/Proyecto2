@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Layout, Table, Button, Spin } from 'antd';
 
 const { Content } = Layout;

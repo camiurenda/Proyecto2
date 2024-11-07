@@ -127,14 +127,7 @@ Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
 5. Push a la rama (`git push origin feature/AmazingFeature`)
 6. Abre un Pull Request
 
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
 ## ✍️ Autores
 
-* **Tu Nombre** - *Trabajo Inicial* - [TuUsuario](https://github.com/tu-usuario)
+* **Camila Urenda** - *Trabajo Inicial* - camiurenda - (https://github.com/camiurenda)
 
-## 📧 Contacto
-
-Si tienes preguntas sobre este proyecto, por favor abre un issue o contacta directamente a [tu@email.com](mailto:tu@email.com).
